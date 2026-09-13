@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24절기 · 계절이 흐른다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Gowun+Batang:wght@400;700&family=Space+Grotesk:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{overflow-x:hidden}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    line-height:1.6;
+    color:#2a1810;
+    min-height:100vh;
+    background:linear-gradient(180deg,
+      #f9dcd0 0%,     /* 입춘 - 매화 살구 */
+      #f5c6b8 8%,
+      #eeb894 16%,    /* 청명 - 벚꽃 뒤 */
+      #e8d078 24%,    /* 곡우 */
+      #c8dc7e 32%,    /* 입하 - 연둣빛 */
+      #8ec66a 40%,
+      #4a9d5f 50%,    /* 하지 - 짙은 초록 */
+      #6ba872 55%,
+      #c8a04a 63%,    /* 입추 - 벼 익음 */
+      #d97a3a 72%,    /* 백로/추분 - 가을 주홍 */
+      #a8452a 80%,    /* 상강 */
+      #6b5f7a 88%,    /* 입동 - 회보라 */
+      #3d4a68 95%,    /* 대설/동지 - 겨울밤 */
+      #2a3852 100%);
+    background-attachment:fixed;
+  }
+
+  /* ============ 상단 헤더 ============ */
+  .top{
+    padding:32px 20px 20px;
+    text-align:center;
+    color:#3a1810;
+  }
+  .top-meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.3em;
+    color:rgba(58,24,16,.7);
+    margin-bottom:12px;
+  }
+  .top-title{
+    font-family:'Noto Serif KR',serif;
+    font-weight:900;
+    font-size:34px;
+    letter-spacing:-.02em;
+    line-height:1.1;
+    margin-bottom:6px;
+  }
+  .top-sub{
+    font-family:'Gowun Batang',serif;
+    font-size:13px;
+    color:rgba(58,24,16,.75);
+    font-style:italic;
+  }
+
+  /* ============ 현재 절기 진행 카드 ============ */
+  .now-card{
+    max-width:520px;
+    margin:24px auto 32px;
+    background:rgba(255,252,246,.94);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-radius:20px;
+    padding:26px 24px 22px;
+    box-shadow:0 8px 32px rgba(58,24,16,.18), 0 1px 0 rgba(255,255,255,.6) inset;
+    position:relative;
+    overflow:hidden;
+  }
+  .now-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg, #d97a3a 0%, #f5c451 100%);
+  }
+  .now-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.3em;
+    color:#8b3a1f;
+    margin-bottom:8px;
+  }
+  .now-date{
+    font-family:'Gowun Batang',serif;
+    font-size:12px;
+    color:#5a3020;
+    margin-bottom:16px;
+  }
+  .now-main{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:20px;
+  }
+  .now-name{
+    font-family:'Noto Serif KR',serif;
+    font-weight:700;
+    font-size:52px;
+    line-height:.95;
+    color:#2a1810;
+    letter-spacing:-.02em;
+  }
+  .now-han{
+    font-family:'Noto Serif KR',serif;
+    font-weight:400;
+    font-size:24px;
+    color:#8b3a1f;
+  }
+  .now-mean{
+    font-family:'Gowun Batang',serif;
+    font-size:14px;
+    color:#5a3020;
+    margin-bottom:22px;
+    line-height:1.7;
+  }
+
+  /* progress bar */
+  .prog-wrap{
+    margin-top:4px;
+  }
+  .prog-labels{
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:#5a3020;
+    margin-bottom:8px;
+  }
+  .prog-labels strong{
+    font-weight:500;
+    color:#8b3a1f;
+    font-size:11px;
+    letter-spacing:.05em;
+  }
+  .prog-track{
+    height:6px;
+    background:rgba(180,90,30,.15);
+    border-radius:3px;
+    overflow:hidden;
+    position:relative;
+  }
+  .prog-fill{
+    height:100%;
+    background:linear-gradient(90deg, #d97a3a 0%, #f5a24a 100%);
+    border-radius:3px;
+    width:0%;
+    transition:width 1.2s cubic-bezier(.4,0,.2,1);
+    box-shadow:0 0 8px rgba(217,122,58,.4);
+  }
+  .prog-mark{
+    position:absolute;
+    top:-3px;
+    width:12px;
+    height:12px;
+    background:#fff;
+    border:2px solid #d97a3a;
+    border-radius:50%;
+    transform:translateX(-6px);
+    box-shadow:0 2px 4px rgba(58,24,16,.25);
+    transition:left 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .prog-days{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:rgba(90,48,32,.7);
+  }
+
+  /* ============ 타임라인 ============ */
+  .timeline{
+    max-width:520px;
+    margin:0 auto;
+    padding:0 16px 60px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .season-mark{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 4px 6px;
+    font-family:'Noto Serif KR',serif;
+    font-weight:500;
+    color:#fff;
+    text-shadow:0 1px 3px rgba(0,0,0,.25);
+  }
+  .season-mark span:first-child{font-size:22px}
+  .season-mark span:last-child{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.2em;
+    opacity:.85;
+  }
+  .season-mark hr{
+    flex:1;
+    border:none;
+    height:1px;
+    background:rgba(255,255,255,.4);
+    margin-left:6px;
+  }
+
+  .card{
+    display:grid;
+    grid-template-columns:44px 1fr auto;
+    gap:14px;
+    align-items:center;
+    padding:14px 16px;
+    background:rgba(255,252,246,.72);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border-radius:12px;
+    cursor:pointer;
+    transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+    border:1px solid rgba(255,255,255,.35);
+  }
+  .card:hover, .card:focus-visible{
+    transform:translateY(-1px);
+    background:rgba(255,252,246,.9);
+    box-shadow:0 6px 20px rgba(58,24,16,.15);
+    outline:none;
+  }
+  .card:active{transform:translateY(0)}
+  .card.is-now{
+    background:rgba(255,252,246,.98);
+    box-shadow:0 6px 24px rgba(217,122,58,.35);
+    border:1px solid rgba(217,122,58,.4);
+  }
+  .card-num{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:300;
+    font-size:22px;
+    color:rgba(90,48,32,.5);
+    line-height:1;
+    text-align:center;
+  }
+  .card.is-now .card-num{color:#d97a3a;font-weight:500}
+  .card-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .card-name{
+    font-family:'Noto Serif KR',serif;
+    font-weight:500;
+    font-size:17px;
+    color:#2a1810;
+    line-height:1.2;
+  }
+  .card-han{
+    font-family:'Noto Serif KR',serif;
+    font-weight:400;
+    font-size:11px;
+    color:#8b3a1f;
+    letter-spacing:.05em;
+  }
+  .card-han em{font-style:normal;color:rgba(58,24,16,.55);margin-left:6px}
+  .card-meta{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:4px;
+  }
+  .card-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:rgba(90,48,32,.75);
+  }
+  .card.is-now .card-date{color:#d97a3a;font-weight:500}
+  .card-chev{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:14px;
+    color:rgba(90,48,32,.4);
+    line-height:1;
+  }
+
+  /* is-now marker inside card */
+  .now-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:.2em;
+    color:#fff;
+    background:#d97a3a;
+    padding:2px 6px;
+    border-radius:3px;
+    margin-left:6px;
+    vertical-align:middle;
+    line-height:1.4;
+  }
+
+  /* ============ 상세 모달 (전체화면 카드 확장) ============ */
+  .detail{
+    position:fixed;
+    inset:0;
+    background:#fbf5eb;
+    z-index:200;
+    overflow-y:auto;
+    transform:translateY(100%);
+    transition:transform .45s cubic-bezier(.4,0,.2,1);
+    -webkit-overflow-scrolling:touch;
+  }
+  .detail.open{transform:translateY(0)}
+  .detail-inner{
+    max-width:640px;
+    margin:0 auto;
+    padding:20px 24px 60px;
+  }
+  .detail-topbar{
+    position:sticky;top:0;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 0;
+    background:linear-gradient(180deg,#fbf5eb 60%, transparent);
+    z-index:2;
+  }
+  .detail-back{
+    background:none;border:none;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.15em;
+    color:#3a1810;
+    cursor:pointer;
+    padding:8px 12px 8px 0;
+    display:flex;align-items:center;gap:6px;
+  }
+  .detail-back:hover{color:#8b3a1f}
+  .detail-index{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:rgba(58,24,16,.5);
+    letter-spacing:.15em;
+  }
+
+  .detail-hero{
+    padding:24px 0 32px;
+    border-bottom:1px solid rgba(139,58,31,.2);
+    margin-bottom:32px;
+  }
+  .detail-season{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.3em;
+    margin-bottom:14px;
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:3px;
+  }
+  .detail-name{
+    font-family:'Noto Serif KR',serif;
+    font-weight:700;
+    font-size:64px;
+    line-height:.95;
+    color:#2a1810;
+    letter-spacing:-.02em;
+    margin-bottom:10px;
+  }
+  .detail-han-big{
+    font-family:'Noto Serif KR',serif;
+    font-weight:400;
+    font-size:32px;
+    color:#8b3a1f;
+    margin-bottom:20px;
+    letter-spacing:.05em;
+  }
+  .detail-when{
+    font-family:'Gowun Batang',serif;
+    font-size:14px;
+    color:#5a3020;
+    line-height:1.6;
+  }
+  .detail-when strong{
+    font-weight:500;
+    color:#3a1810;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    letter-spacing:.05em;
+  }
+
+  /* 진행률 mini (모달 안 - 현재 절기일 때만) */
+  .detail-progress{
+    margin-top:16px;
+    padding:14px 16px;
+    background:rgba(217,122,58,.08);
+    border-left:3px solid #d97a3a;
+    border-radius:0 8px 8px 0;
+  }
+  .detail-progress-text{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:#8b3a1f;
+    margin-bottom:8px;
+    letter-spacing:.05em;
+  }
+  .detail-progress-track{
+    height:4px;background:rgba(139,58,31,.15);border-radius:2px;overflow:hidden;
+  }
+  .detail-progress-fill{
+    height:100%;background:#d97a3a;border-radius:2px;width:0%;
+    transition:width .8s ease;
+  }
+
+  .detail-section{
+    margin-bottom:36px;
+    padding-bottom:32px;
+    border-bottom:1px dashed rgba(139,58,31,.2);
+  }
+  .detail-section:last-child{border-bottom:none}
+  .detail-section-head{
+    display:flex;align-items:baseline;gap:12px;
+    margin-bottom:16px;
+  }
+  .detail-section-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:#8b3a1f;
+    letter-spacing:.15em;
+    flex-shrink:0;
+  }
+  .detail-section-title{
+    font-family:'Noto Serif KR',serif;
+    font-weight:700;
+    font-size:22px;
+    color:#2a1810;
+    letter-spacing:-.01em;
+  }
+
+  /* 뜻과 유래 - 한자 풀이 */
+  .hanja-break{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    padding:24px 8px;
+    background:#f4e8d0;
+    border-radius:12px;
+    margin-bottom:18px;
+  }
+  .hanja-block{
+    text-align:center;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .hanja-block-char{
+    font-family:'Noto Serif KR',serif;
+    font-weight:700;
+    font-size:48px;
+    color:#3a1810;
+    line-height:1;
+  }
+  .hanja-block-mean{
+    font-family:'Gowun Batang',serif;
+    font-size:12px;
+    color:#8b3a1f;
+  }
+  .hanja-plus{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:300;
+    font-size:24px;
+    color:#c8a04a;
+  }
+  .detail-p{
+    font-family:'Gowun Batang',serif;
+    font-size:15px;
+    line-height:1.85;
+    color:#3a1810;
+  }
+  .detail-p + .detail-p{margin-top:12px}
+
+  /* 속담 인용 */
+  .proverb{
+    padding:20px 22px;
+    background:#f4e8d0;
+    border-radius:12px;
+    position:relative;
+    margin-bottom:14px;
+  }
+  .proverb::before{
+    content:'"';
+    font-family:'Noto Serif KR',serif;
+    font-size:64px;
+    color:rgba(139,58,31,.2);
+    position:absolute;
+    top:-4px;left:10px;
+    line-height:1;
+  }
+  .proverb-text{
+    font-family:'Gowun Batang',serif;
+    font-size:16px;
+    font-weight:700;
+    color:#2a1810;
+    line-height:1.6;
+    padding-left:20px;
+  }
+  .proverb-note{
+    font-family:'Gowun Batang',serif;
+    font-size:12px;
+    color:#8b3a1f;
+    font-style:italic;
+    margin-top:8px;
+    padding-left:20px;
+  }
+
+  /* 자연 현상 리스트 */
+  .nature-list{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .nature-list li{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:10px 0;
+    border-bottom:1px dotted rgba(139,58,31,.15);
+    font-family:'Gowun Batang',serif;
+    font-size:14px;
+    color:#3a1810;
+    line-height:1.6;
+  }
+  .nature-list li:last-child{border-bottom:none}
+  .nature-list li::before{
+    content:'·';
+    color:#d97a3a;
+    font-weight:700;
+    font-size:20px;
+    line-height:1;
+  }
+
+  @media (min-width:640px){
+    .top-title{font-size:44px}
+    .now-name{font-size:64px}
+    .detail-name{font-size:80px}
+    .card{grid-template-columns:56px 1fr auto;padding:16px 20px}
+    .card-name{font-size:18px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-meta">TWENTY-FOUR SOLAR TERMS · 二十四節氣</div>
+  <h1 class="top-title">계절이 흐른다</h1>
+  <p class="top-sub" id="today-str">오늘의 날짜</p>
+</header>
+
+<!-- 현재 절기 진행 카드 -->
+<div class="now-card" id="now-card">
+  <div class="now-label">지금은</div>
+  <div class="now-date" id="now-date-lunar">— </div>
+  <div class="now-main">
+    <div class="now-name" id="now-name">—</div>
+    <div class="now-han" id="now-han">—</div>
+  </div>
+  <p class="now-mean" id="now-mean">—</p>
+  <div class="prog-wrap">
+    <div class="prog-labels">
+      <span id="prog-from">—</span>
+      <strong id="prog-status">— 일째 · — 일 중</strong>
+      <span id="prog-to">—</span>
+    </div>
+    <div class="prog-track">
+      <div class="prog-fill" id="prog-fill"></div>
+      <div class="prog-mark" id="prog-mark"></div>
+    </div>
+    <div class="prog-days">
+      <span id="prog-elapsed">경과 — 일</span>
+      <span id="prog-remain">— 일 남음</span>
+    </div>
+  </div>
+</div>
+
+<!-- 24절기 타임라인 -->
+<div class="timeline" id="timeline"></div>
+
+<!-- 상세 모달 -->
+<div class="detail" id="detail" aria-hidden="true" role="dialog">
+  <div class="detail-inner">
+    <div class="detail-topbar">
+      <button class="detail-back" id="detail-back" aria-label="닫기">← 목록으로</button>
+      <span class="detail-index" id="detail-index">— / 24</span>
+    </div>
+    <div class="detail-hero">
+      <span class="detail-season" id="detail-season">SEASON</span>
+      <div class="detail-name" id="detail-name">—</div>
+      <div class="detail-han-big" id="detail-han">—</div>
+      <div class="detail-when" id="detail-when">—</div>
+      <div class="detail-progress" id="detail-progress" hidden>
+        <div class="detail-progress-text" id="detail-progress-text">—</div>
+        <div class="detail-progress-track"><div class="detail-progress-fill" id="detail-progress-fill"></div></div>
+      </div>
+    </div>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <span class="detail-section-num">01</span>
+        <h2 class="detail-section-title">뜻과 유래</h2>
+      </div>
+      <div class="hanja-break" id="detail-hanja"></div>
+      <p class="detail-p" id="detail-meaning">—</p>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <span class="detail-section-num">02</span>
+        <h2 class="detail-section-title">농사와 세시풍속</h2>
+      </div>
+      <p class="detail-p" id="detail-customs">—</p>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <span class="detail-section-num">03</span>
+        <h2 class="detail-section-title">속담과 시구</h2>
+      </div>
+      <div class="proverb">
+        <p class="proverb-text" id="detail-proverb">—</p>
+        <p class="proverb-note" id="detail-proverb-note">—</p>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <span class="detail-section-num">04</span>
+        <h2 class="detail-section-title">자연 현상</h2>
+      </div>
+      <ul class="nature-list" id="detail-nature"></ul>
+    </section>
+  </div>
+</div>
+
+<script>
+// ============ 24절기 데이터 (2026년 기준 근사 날짜) ============
+const terms = [
+  {n:1, han:'立春', kor:'입춘', mean:'봄이 서다', m:2, d:4, season:'spring',
+    ch:[['立','설 립'],['春','봄 춘']],
+    meaning:'입춘은 24절기의 첫머리로, 봄이 시작되는 날이다. 아직 겨울의 냉기가 남아 있지만, 밤이 짧아지고 낮이 조금씩 길어지며 만물이 소생할 준비를 시작한다. 옛사람들은 이 날부터 새로운 한 해의 절기 순환이 열린다고 여겼다.',
+    customs:'대문이나 기둥에 "입춘대길 건양다경(立春大吉 建陽多慶)"이라 쓴 입춘첩을 붙여 한 해의 복을 빌었다. 오신채(파·마늘·부추·달래·미나리 등 매운맛 나는 다섯 나물)를 무쳐 먹으며 겨우내 부족했던 채소를 보충했고, 농가에서는 이 무렵부터 농기구를 손질하며 봄일을 준비했다.',
+    proverb:'입춘 추위는 꿔다 해도 한다',
+    proverb_note:'봄이 왔다 해도 꽃샘추위는 반드시 찾아온다는 뜻. 방심하지 말라는 옛말이다.',
+    nature:['매화 봉오리가 부풀기 시작한다','동풍이 불어 얼음이 녹기 시작한다','겨울잠 자던 벌레들이 움직일 채비를 한다','밤과 낮의 길이 차이가 눈에 띄게 좁혀진다']
+  },
+  {n:2, han:'雨水', kor:'우수', mean:'눈이 비가 된다', m:2, d:19, season:'spring',
+    ch:[['雨','비 우'],['水','물 수']],
+    meaning:'우수는 "빗물"이라는 뜻으로, 눈이 녹아 비가 되고 얼음이 풀려 물이 흐르기 시작하는 시기다. 겨우내 얼었던 대지가 촉촉해지고, 씨앗이 물을 빨아들여 부풀어 오를 준비를 한다. "우수 경칩에 대동강 물도 풀린다"는 말이 이때를 이른다.',
+    customs:'농부들은 논둑을 정비하고 못자리 자리를 살피기 시작했다. 얼었던 우물을 청소하고, 겨우내 덮어둔 곳간을 열어 씨앗의 상태를 점검했다. 처녀들은 이 무렵 첫 나물을 뜯으러 들로 나가기도 했다.',
+    proverb:'우수 뒤에 얼음같이',
+    proverb_note:'우수가 지나면 얼음도 순식간에 녹아 사라진다. 쉽게 사라져버리는 것을 비유할 때 썼다.',
+    nature:['수달이 잡은 물고기를 늘어놓는다는 옛말','기러기가 북쪽으로 다시 돌아간다','초목이 싹틀 준비를 하며 물을 빨아올린다','아침 안개가 자주 낀다']
+  },
+  {n:3, han:'驚蟄', kor:'경칩', mean:'벌레가 깨어난다', m:3, d:6, season:'spring',
+    ch:[['驚','놀랄 경'],['蟄','숨을 칩']],
+    meaning:'경칩은 겨울잠을 자던 벌레·개구리·뱀 들이 봄 천둥소리에 놀라 깨어나 땅 위로 나온다는 뜻이다. 대지가 완연히 풀리고, 흙 속 생명들이 움직이기 시작하는 절기다. 실제로 이 무렵 첫 봄 천둥이 치는 해가 많다.',
+    customs:'옛사람들은 경칩날 개구리·도롱뇽 알을 건져 먹으면 몸에 좋다 하여 논으로 나갔다. 흙벽을 바르거나 담을 고치는 일도 이때 했는데, 겨우내 얼었던 흙이 마침 다루기 좋아졌기 때문이다. 총각·처녀들이 은행 열매를 나누어 먹으며 마음을 확인했다는 풍속도 전한다.',
+    proverb:'경칩 지난 게로군',
+    proverb_note:'겨울잠에서 갓 깨어난 사람처럼, 뒤늦게 나타나거나 굼뜨게 행동하는 사람을 이르는 말.',
+    nature:['개구리가 울기 시작한다','복숭아·살구 꽃봉오리가 부푼다','매가 비둘기로 변한다는 옛 상상','흙 속 벌레들이 지표로 올라온다']
+  },
+  {n:4, han:'春分', kor:'춘분', mean:'봄의 한가운데', m:3, d:20, season:'spring',
+    ch:[['春','봄 춘'],['分','나눌 분']],
+    meaning:'춘분은 태양이 적도를 지나며 낮과 밤의 길이가 거의 같아지는 날이다. 봄의 한가운데를 뜻하며, 이 날을 기점으로 낮이 밤보다 길어지기 시작한다. 자연이 온전히 봄으로 기울어지는 분기점이다.',
+    customs:'농가에서는 이 무렵 담을 고치고 나무를 심었다. 특히 춘분 전후로 부는 매서운 바람을 "꽃샘바람" 혹은 "잎샘바람"이라 하여, 갓 나온 꽃과 잎을 시샘하는 바람으로 여겼다. 조상들은 이 바람을 견뎌야 진짜 봄이 온다고 보았다.',
+    proverb:'이월 바람에 검은 소 뿔이 오그라진다',
+    proverb_note:'춘분 무렵 부는 바람이 얼마나 매섭고 차가운지 과장하여 이르는 말.',
+    nature:['제비가 남쪽에서 돌아온다','진달래·개나리가 피기 시작한다','우레가 울리고 번개가 친다','땅속 벌레가 완전히 움직인다']
+  },
+  {n:5, han:'淸明', kor:'청명', mean:'하늘이 맑고 밝다', m:4, d:5, season:'spring',
+    ch:[['淸','맑을 청'],['明','밝을 명']],
+    meaning:'청명은 하늘이 맑고 날씨가 화창해진다는 뜻이다. 겨울의 흐린 기운이 완전히 가시고, 만물이 왕성하게 자라기 시작하는 시기다. 한식(寒食)과 하루 차이거나 겹치는 해가 많아, 두 명절이 함께 어우러진다.',
+    customs:'조상 산소를 찾아 잔디를 다시 입히고 무너진 곳을 손보는 성묘와 사초(莎草)를 이때 한다. 한식과 겹치므로 찬 음식을 먹는 풍속도 있었다. 농가에서는 논 갈이·밭 갈이를 본격적으로 시작하고, 나무 심기에 가장 좋은 때로 여겼다.',
+    proverb:'청명에는 부지깽이를 꽂아도 싹이 난다',
+    proverb_note:'모든 만물이 왕성하게 자라나 무엇을 심어도 잘 자란다는 뜻. 씨앗을 뿌리기 가장 좋은 때임을 강조.',
+    nature:['오동나무가 꽃을 피운다','들쥐가 사라지고 종달새가 자주 보인다','무지개가 처음 나타나기 시작한다','벚꽃이 만개한다']
+  },
+  {n:6, han:'穀雨', kor:'곡우', mean:'곡식을 적시는 비', m:4, d:20, season:'spring',
+    ch:[['穀','곡식 곡'],['雨','비 우']],
+    meaning:'곡우는 봄비가 백곡(百穀)을 기름지게 한다는 뜻이다. 이 무렵 내리는 비는 씨앗을 부풀리고 새싹을 밀어 올리는 결정적인 물이 된다. 곡우를 넘기면 봄철이 마무리되고, 곧 여름으로 들어선다.',
+    customs:'못자리를 만들고 볍씨를 담그기 시작하는 시기다. 곡우 무렵 자작나무·박달나무에서 나오는 수액을 "곡우물"이라 하여 몸에 좋다 하여 마셨다. 서해에서는 이 무렵 잡히는 조기를 "곡우살이"라 하여 가장 맛있는 조기로 쳤다.',
+    proverb:'곡우에 가물면 땅이 석 자나 마른다',
+    proverb_note:'이때 비가 오지 않으면 한 해 농사를 망친다. 곡우비의 중요성을 이르는 말.',
+    nature:['부평초(개구리밥)가 물 위에 자라기 시작한다','뻐꾸기가 울기 시작한다','뽕나무에 잎이 무성해진다','볍씨가 뿌리를 내린다']
+  },
+  {n:7, han:'立夏', kor:'입하', mean:'여름이 서다', m:5, d:5, season:'summer',
+    ch:[['立','설 립'],['夏','여름 하']],
+    meaning:'입하는 여름의 시작을 알리는 절기다. 이 무렵부터 낮이 눈에 띄게 길어지고, 초록이 짙어지며, 아침저녁으로도 서늘함이 물러난다. 봄의 부드러운 기운이 여름의 활기찬 기운으로 바뀐다.',
+    customs:'모내기 준비가 본격적으로 시작된다. 이 무렵 여린 쑥으로 쑥버무리·쑥떡을 만들어 먹으며 봄의 마지막 향기를 즐겼다. 아이들이 손톱에 봉숭아 물을 들이기 시작하는 것도 이때다.',
+    proverb:'입하 바람에 씨나락 몰린다',
+    proverb_note:'입하 바람이 세면 못자리의 볍씨가 한쪽으로 쏠려버린다. 그만큼 씨앗 관리에 정성이 필요한 때다.',
+    nature:['청개구리가 울기 시작한다','지렁이가 흙 위로 자주 나온다','오이·참외 꽃이 핀다','왕과(왕오이)의 넝쿨이 뻗기 시작한다']
+  },
+  {n:8, han:'小滿', kor:'소만', mean:'조금씩 가득 찬다', m:5, d:21, season:'summer',
+    ch:[['小','작을 소'],['滿','찰 만']],
+    meaning:'소만은 만물이 점점 자라 조금씩 가득 차오른다는 뜻이다. 보리 이삭이 여물어 가고, 들녘이 초록으로 빽빽해진다. 아직 완전히 "만(滿)"에 이르지는 않은, 무르익어가는 도중의 절기다.',
+    customs:'모내기 준비가 최고조에 이르고, 밭작물도 왕성하게 자라 잡초 뽑기가 시급하다. 죽순이 한창 나오는 때라 죽순 요리가 밥상에 자주 오른다. 이 무렵 부는 서늘한 바람을 조심하라는 옛말이 많다.',
+    proverb:'소만 바람에 설늙은이 얼어 죽는다',
+    proverb_note:'초여름이라 방심하지만 소만 바람이 뜻밖에 매서워, 미처 준비 못 한 노인이 감기로 앓아눕는다는 뜻.',
+    nature:['씀바귀가 무성해진다','냉이가 시들어간다','대나무 죽순이 흙을 밀고 오른다','보리가 노랗게 익기 시작한다']
+  },
+  {n:9, han:'芒種', kor:'망종', mean:'까끄라기 곡식을 심는다', m:6, d:6, season:'summer',
+    ch:[['芒','까끄라기 망'],['種','씨 종']],
+    meaning:'망종은 까끄라기(벼·보리·밀 등의 껄끄러운 수염)가 있는 곡식을 뜻한다. 이때는 보리를 베고 벼를 심는 시기가 겹쳐, 농가에서 가장 바쁜 때다. 옛말에 "발등에 오줌 눌 새도 없다"고 할 정도였다.',
+    customs:'보리 베기와 모내기를 한꺼번에 해야 하는 시기라, 온 마을이 품앗이로 서로 도왔다. 갓 벤 보리로 지은 보리밥이 밥상에 오르고, 망종을 넘겨서까지 모를 심지 못하면 그해 농사가 늦는다 하여 서둘렀다.',
+    proverb:'보리는 익어서 먹게 되고 볏모는 자라서 심게 되니 망종이라',
+    proverb_note:'망종이라는 이름 그대로, 두 가지 곡식의 일이 겹치는 절기임을 잘 드러낸 옛말.',
+    nature:['사마귀가 알에서 깨어난다','매실이 노랗게 익는다','반딧불이가 나타나기 시작한다','왜가리가 시끄럽게 운다']
+  },
+  {n:10, han:'夏至', kor:'하지', mean:'여름의 정점', m:6, d:21, season:'summer',
+    ch:[['夏','여름 하'],['至','이를 지']],
+    meaning:'하지는 태양이 가장 북쪽까지 올라와 낮이 일 년 중 가장 긴 날이다. 낮이 약 14시간 30분에 이르고, 그림자는 가장 짧아진다. 여름의 극점이자, 이후부터는 낮이 서서히 짧아지기 시작한다.',
+    customs:'예로부터 하지가 지나도록 비가 오지 않으면 마을에서 기우제를 지냈다. 감자를 캐기 시작하는 때이기도 해서 "하지 감자"라는 말이 있다. 강한 햇볕 아래 논에 물을 채우고 벼가 뿌리를 튼튼히 내리도록 관리하는 일이 중요했다.',
+    proverb:'하지가 지나면 구름장마다 소나기',
+    proverb_note:'하지 이후 대기가 불안정해져 갑작스러운 소나기가 잦다는 뜻. 장마의 시작을 알린다.',
+    nature:['사슴 뿔이 빠진다','매미가 처음 울기 시작한다','반하(半夏)라는 풀이 돋는다','해가 가장 오래 하늘에 머문다']
+  },
+  {n:11, han:'小暑', kor:'소서', mean:'작은 더위', m:7, d:7, season:'summer',
+    ch:[['小','작을 소'],['暑','더울 서']],
+    meaning:'소서는 본격적인 더위가 시작되는 절기다. "작은 더위"라 이름 붙었지만, 이때부터 장마와 무더위가 겹쳐 몸이 지치기 쉽다. 삼복(초복)이 소서와 대서 사이에 든다.',
+    customs:'논매기가 한창인 시기다. 밀 수확이 끝난 뒤라 새 밀가루로 국수·수제비·부침개를 해 먹었다. 참외·수박 등 여름 과일이 익어가고, 밭에서는 오이가 넉넉하게 나기 시작한다.',
+    proverb:'소서가 넘으면 새 각시도 모 심는다',
+    proverb_note:'그만큼 모심기가 늦어 일손이 부족해지므로, 평소 밭에 나가지 않던 사람까지 논에 나서게 된다는 뜻.',
+    nature:['매미 울음이 커진다','반딧불이가 밤에 무리 지어 난다','연꽃이 피기 시작한다','귀뚜라미가 벽 그늘에 자리를 잡는다']
+  },
+  {n:12, han:'大暑', kor:'대서', mean:'큰 더위', m:7, d:23, season:'summer',
+    ch:[['大','큰 대'],['暑','더울 서']],
+    meaning:'대서는 일 년 중 가장 더운 시기다. 태양이 가장 뜨겁게 대지를 달구고, 습기와 열이 겹쳐 몸이 가장 힘든 때다. 중복이 대서 무렵에 들어, 예로부터 보양식으로 몸을 다스렸다.',
+    customs:'삼계탕·팥죽·수박 등 여름 보양식을 챙겨 먹었다. 참외와 수박은 이 무렵 가장 달다. 논에서는 병충해 방제가 중요해지고, 밭에서는 김매기와 물주기가 하루의 큰 일이다.',
+    proverb:'대서 더위에 염소 뿔도 녹는다',
+    proverb_note:'단단한 염소 뿔조차 녹아버릴 만큼 대서의 더위가 지독하다는 과장된 옛말.',
+    nature:['참외·수박이 한창이다','옥수수가 여물기 시작한다','소나기가 잦아진다','썩은 풀에서 반딧불이가 난다는 옛말']
+  },
+  {n:13, han:'立秋', kor:'입추', mean:'가을이 서다', m:8, d:7, season:'autumn',
+    ch:[['立','설 립'],['秋','가을 추']],
+    meaning:'입추는 가을이 시작되는 절기다. 아직 낮의 더위는 남아 있지만, 아침저녁으로 서늘한 바람이 불기 시작한다. 벼가 이삭을 맺기 시작하고, 매미 소리가 조금씩 잦아든다.',
+    customs:'김장에 쓸 무·배추 씨앗을 뿌리는 시기다. 이때 씨를 놓쳐 늦게 뿌리면 김장 채소가 제대로 자라지 못한다. 가을장마가 시작되기도 해서, 논밭에 물이 넘치지 않도록 살폈다.',
+    proverb:'입추 뒤에는 삼 일에 오 리 간다',
+    proverb_note:'입추가 지나면 해가 눈에 띄게 짧아진다는 뜻. 하루에 오 리(약 2km)씩 낮이 짧아지듯 시간이 빠르게 흐른다.',
+    nature:['서늘한 바람이 불기 시작한다','아침 이슬이 처음 맺힌다','매미(쓰름매미)가 운다','기러기가 남쪽으로 돌아올 채비를 한다']
+  },
+  {n:14, han:'處暑', kor:'처서', mean:'더위가 물러난다', m:8, d:23, season:'autumn',
+    ch:[['處','그칠 처'],['暑','더울 서']],
+    meaning:'처서는 "더위가 그친다"는 뜻이다. 낮 더위는 남아 있어도 그 기세가 확연히 꺾이고, 아침저녁의 공기가 완연히 서늘해진다. 여름과 가을이 갈리는 실질적인 분기점이다.',
+    customs:'여름 내내 눅눅했던 옷과 이불을 볕에 말리는 "포쇄(曝曬)"를 했다. 조상 산소의 풀을 베는 벌초도 이 무렵부터 시작된다. 논의 벼는 이삭이 여물기 시작하고, 태풍만 잘 피하면 풍년이 확실해지는 때다.',
+    proverb:'처서에 비가 오면 독의 곡식도 준다',
+    proverb_note:'처서 무렵 비가 많이 오면 벼 이삭이 제대로 여물지 못해 그해 수확이 줄어든다는 뜻.',
+    nature:['모기 입이 비뚤어진다(더위와 함께 모기 기세가 꺾인다)','매가 새 사냥을 시작한다','목화 열매가 벌어지기 시작한다','벼 이삭이 고개를 숙인다']
+  },
+  {n:15, han:'白露', kor:'백로', mean:'흰 이슬이 맺힌다', m:9, d:8, season:'autumn',
+    ch:[['白','흰 백'],['露','이슬 로']],
+    meaning:'백로는 밤 기온이 뚝 떨어지면서 풀잎마다 흰 이슬이 맺히는 시기다. 가을이 완연히 자리를 잡고, 아침 안개와 이슬이 들판을 덮는다. 대기가 맑아지고 하늘이 유난히 높아 보이는 절기다.',
+    customs:'벼 이삭이 익어가는 결정적인 시기라, 태풍 소식에 마을 사람들이 특히 예민해졌다. 이때 나오는 포도가 제철이고, 갓 딴 포도의 첫 알은 조상께 먼저 올렸다는 풍속이 있다. 아침저녁 서늘하니 웃옷 하나 걸치기 좋은 때다.',
+    proverb:'백로에 비가 오면 십리 천석을 늘린다',
+    proverb_note:'백로 무렵 알맞게 비가 내리면 벼가 잘 여물어, 십 리 안의 논에서 수확이 크게 늘어난다는 풍년의 조짐.',
+    nature:['풀잎에 흰 이슬이 맺힌다','기러기가 북쪽에서 날아온다','제비가 남쪽으로 떠나기 시작한다','새들이 겨우살이 먹이를 모으기 시작한다']
+  },
+  {n:16, han:'秋分', kor:'추분', mean:'가을의 한가운데', m:9, d:23, season:'autumn',
+    ch:[['秋','가을 추'],['分','나눌 분']],
+    meaning:'추분은 태양이 다시 적도를 지나며 낮과 밤의 길이가 같아지는 날이다. 가을의 한가운데를 뜻하며, 이후부터는 밤이 낮보다 길어지기 시작한다. 여름의 뜨거움이 완전히 물러나고, 서늘함이 자리를 잡는다.',
+    customs:'벼 베기가 본격적으로 시작되고, 밭에서는 목화를 따기 시작한다. 하늘이 맑고 습도가 낮아 곡식을 말리기 좋은 때다. 이 무렵 옛사람들은 노인의 지팡이·곰방대 같은 겨울 물건을 손질하기 시작했다.',
+    proverb:'추분이 지나면 우렛소리 그친다',
+    proverb_note:'추분 이후로는 여름의 천둥이 자취를 감춘다. 계절의 뚜렷한 전환을 알리는 자연의 신호.',
+    nature:['우레가 그친다','벌레들이 흙 속으로 몸을 감추기 시작한다','도랑의 물이 마르기 시작한다','들녘이 황금빛으로 물든다']
+  },
+  {n:17, han:'寒露', kor:'한로', mean:'찬 이슬이 내린다', m:10, d:8, season:'autumn',
+    ch:[['寒','찰 한'],['露','이슬 로']],
+    meaning:'한로는 이슬이 차가워진다는 뜻이다. 백로의 이슬이 상강의 서리로 바뀌기 직전 단계로, 가을이 깊어지는 절기다. 국화가 만발하고, 산이 붉게 물들기 시작한다.',
+    customs:'국화가 한창이라 국화전을 부치고 국화주를 담갔다. 노인들은 국화주를 마시며 오래 사는 것을 축원했다. 추수 마무리 준비가 시작되고, 겨울 준비도 슬슬 챙기기 시작한다.',
+    proverb:'한로가 지나면 제비도 강남으로 간다',
+    proverb_note:'한로 무렵이면 여름철 반가운 손님이던 제비마저 남쪽으로 떠난다. 완연한 가을이 왔음을 알리는 말.',
+    nature:['국화가 노랗게 만발한다','기러기가 손님으로 찾아온다','참새가 물속에 들어가 조개가 된다는 옛 상상','산 단풍이 물들기 시작한다']
+  },
+  {n:18, han:'霜降', kor:'상강', mean:'서리가 내린다', m:10, d:23, season:'autumn',
+    ch:[['霜','서리 상'],['降','내릴 강']],
+    meaning:'상강은 이슬이 얼어 서리가 되어 내리는 절기다. 아침에 들판이 하얗게 덮이고, 마지막 남은 잎들이 붉게 타올랐다가 떨어진다. 가을의 마지막 절기이자, 겨울로 가는 마지막 계단이다.',
+    customs:'추수를 마무리하고, 김장 준비를 본격적으로 시작한다. 감·대추가 완전히 익어 수확한다. 서리가 내리기 전에 서리 맞으면 못쓰는 채소들을 서둘러 갈무리하는 것이 이 시기의 큰 일이다.',
+    proverb:'상강 90일 두고 모 심는다',
+    proverb_note:'상강에서 90일을 거슬러 올라가 모심기 시기를 정한다는 뜻. 절기가 농사의 시간표 역할을 했음을 보여주는 말.',
+    nature:['첫 서리가 내린다','단풍이 절정에 이른다','풀이 말라 색이 변한다','벌레들이 자취를 감춘다']
+  },
+  {n:19, han:'立冬', kor:'입동', mean:'겨울이 서다', m:11, d:7, season:'winter',
+    ch:[['立','설 립'],['冬','겨울 동']],
+    meaning:'입동은 겨울이 시작되는 절기다. 물이 얼기 시작하고, 땅이 굳어간다. 초목이 완전히 잎을 떨구고 겨울 채비에 들어간다. 사람도 두꺼운 옷을 꺼내 입고, 집안 곳곳을 겨울에 맞게 준비한다.',
+    customs:'김장이 본격적으로 시작된다. 조상께 시제(時祭)를 지내고, 팥죽·시루떡을 나눠 먹었다. 마을에서는 소·돼지를 잡아 겨울 양식을 나누는 곳도 있었다. 아궁이와 굴뚝을 손보고, 문풍지를 새로 바르는 것도 이때다.',
+    proverb:'입동이 지나면 김장도 해야 한다',
+    proverb_note:'입동을 넘기고도 김장을 하지 않으면 배추가 얼어버려 김장을 망친다. 시기를 놓치지 말라는 뜻.',
+    nature:['물이 얼기 시작한다','땅이 얼기 시작한다','꿩이 큰물에 들어가 조개가 된다는 옛 상상','무지개가 자취를 감춘다']
+  },
+  {n:20, han:'小雪', kor:'소설', mean:'작은 눈이 내린다', m:11, d:22, season:'winter',
+    ch:[['小','작을 소'],['雪','눈 설']],
+    meaning:'소설은 첫눈이 흩날리기 시작하는 시기다. 아직 큰 눈이 쌓이지는 않지만, 겨울이 자리를 잡았음을 알리는 눈이다. "손돌바람"이라 부르는 매서운 북서풍이 이 무렵부터 분다.',
+    customs:'김장을 마무리하고, 시래기와 무말랭이·호박고지 등 겨울 저장 식품을 만든다. 처마 밑에 매달린 곶감·시래기가 이 무렵의 정겨운 풍경이다. 두꺼운 이불을 꺼내고 아궁이 불을 크게 지피기 시작한다.',
+    proverb:'소설 추위는 빚내서라도 한다',
+    proverb_note:'소설 무렵 반드시 한 차례 매서운 추위가 온다는 뜻. 자연은 정직하게 계절의 순서를 지킨다는 말.',
+    nature:['첫눈이 흩날린다','무지개가 완전히 사라진다','초목이 잎을 다 떨군다','손돌바람이 매섭게 분다']
+  },
+  {n:21, han:'大雪', kor:'대설', mean:'큰 눈이 내린다', m:12, d:7, season:'winter',
+    ch:[['大','큰 대'],['雪','눈 설']],
+    meaning:'대설은 큰 눈이 내린다는 뜻이다. 실제로 이 무렵 폭설이 자주 내리고, 산과 들이 하얗게 덮인다. 겨울의 본격적인 한복판으로 들어서는 절기다.',
+    customs:'농한기라 집안에서 하는 일이 많아진다. 메주를 쑤어 매달고, 새끼를 꼬고, 짚신을 삼는다. 온 식구가 화롯가에 둘러앉아 이야기를 나누는 저녁 풍경이 이 무렵의 상징이다. 큰 눈이 내리면 아이들은 눈사람을 만들었다.',
+    proverb:'눈은 보리의 이불이다',
+    proverb_note:'대설에 눈이 많이 오면 보리밭을 이불처럼 덮어 주어 겨울을 잘 나게 하고, 이듬해 풍년이 든다는 뜻.',
+    nature:['곰이 굴에 들어가 겨울잠을 잔다','뱀·개구리가 완전히 잠든다','밤이 급격히 길어진다','매가 가장 사납게 사냥한다']
+  },
+  {n:22, han:'冬至', kor:'동지', mean:'겨울의 정점 · 밤이 가장 길다', m:12, d:22, season:'winter',
+    ch:[['冬','겨울 동'],['至','이를 지']],
+    meaning:'동지는 밤이 일 년 중 가장 긴 날이다. 이 날 이후로 낮이 다시 조금씩 길어지므로, 옛사람들은 동지를 "작은 설(亞歲)"이라 부르며 새해가 다시 시작되는 날로 여겼다. 태양이 다시 돌아오는 날이다.',
+    customs:'팥죽을 쑤어 먹으며 잡귀를 쫓았다. 붉은 팥의 색이 귀신을 물리친다고 믿었다. 새해 달력(冊曆)을 이때 주고받는 풍습이 있었고, 나이 한 살을 더 먹는다 하여 "동지팥죽을 먹어야 한 살 더 먹는다"고 하였다.',
+    proverb:'동지가 지나면 푸성귀도 새 마음 든다',
+    proverb_note:'동지를 지나면 해가 다시 길어지기 시작하므로, 채소마저 봄을 예감하고 자랄 준비를 한다는 뜻.',
+    nature:['밤이 가장 길고 낮이 가장 짧다','지렁이가 몸을 웅크린다','사슴 뿔이 빠진다','샘물이 얼기 시작한다']
+  },
+  {n:23, han:'小寒', kor:'소한', mean:'작은 추위 · 실제 가장 춥다', m:1, d:5, season:'winter',
+    ch:[['小','작을 소'],['寒','찰 한']],
+    meaning:'소한은 이름은 "작은 추위"지만, 우리나라에서는 실제로 일 년 중 가장 추운 때다. 대륙에서 내려오는 찬 공기가 최고조에 이르고, 강물이 두껍게 얼어붙는다.',
+    customs:'집안에 두꺼운 이불과 문풍지를 다시 챙기고, 몸을 따뜻하게 하는 음식을 먹었다. 얼음낚시가 한창인 때이기도 하다. 소한을 잘 넘기면 봄까지 큰 고비가 없다고 여겼다.',
+    proverb:'대한이 소한 집에 놀러 갔다가 얼어 죽었다',
+    proverb_note:'"큰 추위" 대한보다 "작은 추위" 소한이 실제로 더 춥다는 것을 재치 있게 표현한 옛말.',
+    nature:['기러기가 북쪽으로 돌아갈 채비를 한다','까치가 집을 짓기 시작한다','꿩이 울기 시작한다','강물이 가장 두껍게 언다']
+  },
+  {n:24, han:'大寒', kor:'대한', mean:'큰 추위 · 한 해의 끝', m:1, d:20, season:'winter',
+    ch:[['大','큰 대'],['寒','찰 한']],
+    meaning:'대한은 24절기의 마지막이다. 이름은 "큰 추위"이지만, 실제 추위는 소한 때가 정점이고 대한 무렵부터는 서서히 풀리는 해가 많다. 대한을 지나면 곧 입춘, 다시 한 해의 절기 순환이 시작된다.',
+    customs:'콩나물국·팥죽 같은 뜨거운 국물을 먹으며 마지막 겨울 고비를 넘긴다. 대한 다음 날부터 입춘 전날까지의 5일간을 "해넘이"라 하여, 묵은해를 정리하고 새봄을 맞이할 준비를 했다.',
+    proverb:'춥지 않은 대한이 없다',
+    proverb_note:'이름값을 하듯 대한 무렵에는 반드시 매서운 추위가 한 번은 찾아온다는 뜻.',
+    nature:['닭이 알을 품기 시작한다','매가 사납고 빠르게 난다','저수지 얼음이 두터워진다','바람이 무엇보다 매섭다']
+  }
+];
+
+const seasonLabels = {
+  spring:{ko:'봄',en:'SPRING',color:'#e8988a',bg:'rgba(232,152,138,.15)'},
+  summer:{ko:'여름',en:'SUMMER',color:'#4a9d5f',bg:'rgba(74,157,95,.15)'},
+  autumn:{ko:'가을',en:'AUTUMN',color:'#c8551f',bg:'rgba(200,85,31,.15)'},
+  winter:{ko:'겨울',en:'WINTER',color:'#4a5e7d',bg:'rgba(74,94,125,.15)'}
+};
+
+// ============ 현재 절기 및 진행률 계산 ============
+function getCurrentInfo() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const nowTs = now.getTime();
+
+  // terms 배열은 입춘(0) → ... → 동지(21) → 소한(22) → 대한(23) 순서지만,
+  // 달력상 실제 순서는 소한 → 대한 → 입춘 → ... → 동지.
+  // 아래 배열은 terms 배열의 인덱스를 "달력 순서"로 재배열한 것.
+  const chronoIdx = [22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+
+  let currentIdx = -1, currentStartTs = null;
+  let nextIdx = -1, nextStartTs = null;
+
+  // 달력 순서로 순회하다가 "미래 절기"를 처음 만나면 그 직전이 현재 절기.
+  for (let i = 0; i < 24; i++) {
+    const ti = chronoIdx[i];
+    const ts = new Date(y, terms[ti].m - 1, terms[ti].d).getTime();
+    if (nowTs >= ts) {
+      currentIdx = ti;
+      currentStartTs = ts;
+    } else {
+      if (currentIdx !== -1) {
+        // 정상: 방금 지난 절기가 현재, 이 절기가 다음
+        nextIdx = ti;
+        nextStartTs = ts;
+      } else {
+        // 소한 이전 (1월 1~4일) → 지난 해 동지가 현재, 올해 소한이 다음
+        currentIdx = 21;
+        currentStartTs = new Date(y - 1, terms[21].m - 1, terms[21].d).getTime();
+        nextIdx = 22;
+        nextStartTs = ts;
+      }
+      break;
+    }
+  }
+
+  // 반복이 끝까지 갔다는 건 12월 후반 동지 이후. 다음 절기(소한)는 다음 해.
+  if (nextIdx === -1) {
+    nextIdx = 22;
+    nextStartTs = new Date(y + 1, terms[22].m - 1, terms[22].d).getTime();
+  }
+
+  const msDay = 86400000;
+  const totalDays = Math.round((nextStartTs - currentStartTs) / msDay);
+  const dayOfTerm = Math.floor((nowTs - currentStartTs) / msDay) + 1;
+  const remainDays = totalDays - dayOfTerm + 1;
+  const progress = Math.min(1, Math.max(0, (nowTs - currentStartTs) / (nextStartTs - currentStartTs)));
+
+  return {
+    now, currentIdx, current: terms[currentIdx],
+    next: terms[nextIdx],
+    currentStart: new Date(currentStartTs),
+    nextStart: new Date(nextStartTs),
+    dayOfTerm, totalDays, remainDays, progress
+  };
+}
+
+const info = getCurrentInfo();
+
+// ============ 상단 오늘 날짜 ============
+function formatKoreanDate(d) {
+  const weekdays = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${weekdays[d.getDay()]}요일`;
+}
+function formatShortDate(d) {
+  return `${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+document.getElementById('today-str').textContent = formatKoreanDate(info.now);
+
+// ============ 현재 절기 카드 ============
+const c = info.current;
+document.getElementById('now-date-lunar').textContent = 
+  `${formatShortDate(info.currentStart)} ~ ${formatShortDate(new Date(info.nextStart.getTime()-86400000))}`;
+document.getElementById('now-name').textContent = c.kor;
+document.getElementById('now-han').textContent = c.han;
+document.getElementById('now-mean').textContent = c.meaning.split('.')[0] + '.';
+document.getElementById('prog-from').textContent = c.kor;
+document.getElementById('prog-to').textContent = info.next.kor;
+document.getElementById('prog-status').textContent = `${c.kor} ${info.dayOfTerm}일째 · 총 ${info.totalDays}일 중`;
+document.getElementById('prog-elapsed').textContent = `경과 ${info.dayOfTerm}일`;
+document.getElementById('prog-remain').textContent = `${info.remainDays}일 남음`;
+
+// 애니메이션으로 채우기
+setTimeout(() => {
+  const pct = info.progress * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-mark').style.left = pct + '%';
+}, 200);
+
+// ============ 24절기 타임라인 렌더링 ============
+const timeline = document.getElementById('timeline');
+let lastSeason = null;
+terms.forEach((t, i) => {
+  if (t.season !== lastSeason) {
+    const mark = document.createElement('div');
+    mark.className = 'season-mark';
+    const s = seasonLabels[t.season];
+    mark.innerHTML = `<span>${s.ko}</span><hr><span>${s.en}</span>`;
+    timeline.appendChild(mark);
+    lastSeason = t.season;
+  }
+  const card = document.createElement('button');
+  card.className = 'card' + (i === info.currentIdx ? ' is-now' : '');
+  card.setAttribute('data-idx', i);
+  card.setAttribute('type', 'button');
+  card.setAttribute('aria-label', `${t.kor} 상세보기`);
+  const nowTagHtml = i === info.currentIdx ? '<span class="now-tag">NOW</span>' : '';
+  card.innerHTML = `
+    <div class="card-num">${String(t.n).padStart(2,'0')}</div>
+    <div class="card-body">
+      <div class="card-name">${t.kor}${nowTagHtml}</div>
+      <div class="card-han">${t.han}<em>${t.mean}</em></div>
+    </div>
+    <div class="card-meta">
+      <div class="card-date">${String(t.m).padStart(2,'0')}.${String(t.d).padStart(2,'0')}</div>
+      <div class="card-chev">→</div>
+    </div>
+  `;
+  card.addEventListener('click', () => openDetail(i));
+  timeline.appendChild(card);
+});
+
+// ============ 상세 모달 ============
+const detail = document.getElementById('detail');
+const backBtn = document.getElementById('detail-back');
+
+function openDetail(idx) {
+  const t = terms[idx];
+  const s = seasonLabels[t.season];
+  const isCurrent = idx === info.currentIdx;
+  
+  document.getElementById('detail-index').textContent = `${String(t.n).padStart(2,'0')} / 24`;
+  const seasonEl = document.getElementById('detail-season');
+  seasonEl.textContent = `${s.ko.toUpperCase()} · ${s.en}`;
+  seasonEl.style.color = s.color;
+  seasonEl.style.background = s.bg;
+  document.getElementById('detail-name').textContent = t.kor;
+  document.getElementById('detail-han').textContent = t.han;
+  
+  // 시작일 계산 (현재 절기면 실제 시작일, 아니면 이번 해 시작일)
+  const startD = isCurrent ? info.currentStart : new Date(info.now.getFullYear(), t.m-1, t.d);
+  const endIdx = (idx + 1) % 24;
+  const endT = terms[endIdx];
+  let endD = new Date(startD.getFullYear(), endT.m-1, endT.d);
+  if (endD <= startD) endD = new Date(startD.getFullYear()+1, endT.m-1, endT.d);
+  endD = new Date(endD.getTime() - 86400000); // 다음 절기 시작 -1일 = 이 절기 종료
+  
+  const days = Math.round((endD - startD) / 86400000) + 1;
+  document.getElementById('detail-when').innerHTML = 
+    `<strong>${formatShortDate(startD)} → ${formatShortDate(endD)}</strong><br>약 ${days}일 동안 이어지는 절기`;
+  
+  // 현재 절기라면 진행률 표시
+  const progressBox = document.getElementById('detail-progress');
+  if (isCurrent) {
+    progressBox.hidden = false;
+    document.getElementById('detail-progress-text').textContent = 
+      `${info.dayOfTerm}일째 · 총 ${info.totalDays}일 중 (${Math.round(info.progress*100)}% 지남)`;
+    setTimeout(() => {
+      document.getElementById('detail-progress-fill').style.width = (info.progress*100) + '%';
+    }, 300);
+  } else {
+    progressBox.hidden = true;
+    document.getElementById('detail-progress-fill').style.width = '0%';
+  }
+  
+  // 뜻과 유래 - 한자 풀이
+  const hanjaBox = document.getElementById('detail-hanja');
+  hanjaBox.innerHTML = '';
+  t.ch.forEach((pair, i) => {
+    if (i > 0) {
+      const plus = document.createElement('div');
+      plus.className = 'hanja-plus';
+      plus.textContent = '+';
+      hanjaBox.appendChild(plus);
+    }
+    const block = document.createElement('div');
+    block.className = 'hanja-block';
+    block.innerHTML = `<div class="hanja-block-char">${pair[0]}</div><div class="hanja-block-mean">${pair[1]}</div>`;
+    hanjaBox.appendChild(block);
+  });
+  document.getElementById('detail-meaning').textContent = t.meaning;
+  document.getElementById('detail-customs').textContent = t.customs;
+  document.getElementById('detail-proverb').textContent = t.proverb;
+  document.getElementById('detail-proverb-note').textContent = t.proverb_note;
+  
+  const natUl = document.getElementById('detail-nature');
+  natUl.innerHTML = '';
+  t.nature.forEach(n => {
+    const li = document.createElement('li');
+    li.textContent = n;
+    natUl.appendChild(li);
+  });
+  
+  detail.classList.add('open');
+  detail.setAttribute('aria-hidden','false');
+  detail.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  backBtn.focus();
+}
+
+function closeDetail() {
+  detail.classList.remove('open');
+  detail.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+
+backBtn.addEventListener('click', closeDetail);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && detail.classList.contains('open')) closeDetail();
+});
+</script>
+</body>
+</html>
